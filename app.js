@@ -4,25 +4,76 @@ const app = express();
 app.use(express.json());
 
 let todos = [
-    {
-        id:1,
-        title: "Complete ASD Assignments",
-        completed: false
-    },
-    {
-        id:2,
-        title: "Buy stationery",
-        completed: true
-    },
-    {
-        id:3,
-        title: "Go shopping",
-        completed: false
-    }
+  {
+    id: 1,
+    title: "Study Express",
+    completed: false,
+    priority: "high",
+    tags: ["study", "backend"],
+    dueDate: "2026-09-01",
+    reminder: "2026-08-31",
+    sharedWith: ["Manas"],
+    notification: true
+  },
+  {
+    id: 2,
+    title: "Complete assignment",
+    completed: true,
+    priority: "medium",
+    tags: ["college","study"],
+    dueDate: "2026-09-02",
+    reminder: null,
+    sharedWith: [],
+    notification: false
+  },
+  {
+    id: 3,
+    title: "Buy stationery",
+    completed: false,
+    priority: "low",
+    tags: ["college"],
+    dueDate: "2026-09-02",
+    reminder: null,
+    sharedWith: [],
+    notification: false
+  }
 ];
 
+// Display todos
 app.get('/todos',(req,res)=>{
-    res.json(todos)
+    // for all todos => no query params
+    // console.log(req.query)
+    let result = todos;
+    
+    // Searching by title => QUERY PARAMS
+    if(req.query.search){
+        result = result.filter((obj)=>{
+            return obj.title.trim().toLowerCase().includes(req.query.search.trim().toLowerCase());
+        })
+    }
+    // Filter by priority
+    if(req.query.priority){
+        result = result.filter((obj)=>{
+            return obj.priority.trim().toLowerCase() == (req.query.priority.trim().toLowerCase());
+        })
+    }
+    // Filter by completed behaviour
+    if(req.query.completed){
+        result = result.filter((obj)=>{
+            return String(obj.completed) == req.query.completed.trim().toLowerCase();
+        })
+    }
+    // Filter by one tag
+    if(req.query.tag){
+        result = result.filter((obj)=>{
+            return obj.tags.includes(req.query.tag.trim().toLowerCase());
+        })
+    }
+    // Filter by multiple tags => later
+
+    res.json(result)
+
+
 })
 app.get('/todos/:id',(req,res)=>{
     let id = req.params.id;
