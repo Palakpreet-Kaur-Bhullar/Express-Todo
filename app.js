@@ -39,7 +39,8 @@ let todos = [
   }
 ];
 
-// Display todos
+// Display todos (All, searching,filtering)
+
 app.get('/todos',(req,res)=>{
     // for all todos => no query params
     // console.log(req.query)
@@ -75,18 +76,40 @@ app.get('/todos',(req,res)=>{
 
 
 })
+
+// Display todo by ID
+
 app.get('/todos/:id',(req,res)=>{
-    let id = req.params.id;
-    res.json(todos[id-1])
+    const id = Number(req.params.id);
+    let found = todos.find((obj)=>obj.id==id)
+    if(found==undefined){
+        res.status(404).send("Todo not found");
+        return;
+    }
+    res.json(found)
 })
 
+// Creating a new todo task
+
 app.post('/todos',(req,res)=>{
-    todos.push(req.body);
-    res.json(req.body)
+    const todo = {
+    id: todos.length + 1,
+    title: req.body.title,
+    completed: false,
+    priority: req.body.priority || "low",
+    tags: req.body.tags || [],
+    dueDate: req.body.dueDate || null,
+    reminder: req.body.reminder || null,
+    sharedWith: req.body.sharedWith || [],
+    notification: req.body.notification || false
+  };
+
+    todos.push(todo);
+    res.status(200).json(req.body)
 })
 
 app.put('/todos/:id',(req,res)=>{
-    let id = req.params.id;
+    const id = Number(req.params.id);
     todos[id-1] = req.body;
     res.json(todos[id-1]);
 })
